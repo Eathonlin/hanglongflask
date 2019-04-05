@@ -1,5 +1,5 @@
-import cv2
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, url_for
+# import cv2
 import VideoCamera as Video
 
 app = Flask(__name__)
@@ -9,10 +9,15 @@ app = Flask(__name__)
 def login():
     if request.method == 'POST':
         if request.form['name'] == "HLAD" and request.form["password"] == "1234":
-            return render_template("image.html")
+            return render_template("funlist.html")
         else:
             return render_template("index.html", alertdata="密碼錯誤!!")
     return render_template("index.html")
+
+
+@app.route('/myside/<myurl>')
+def Leaflet(myurl):
+    return render_template(myurl + '.html')
 
 
 def gen(camera):
