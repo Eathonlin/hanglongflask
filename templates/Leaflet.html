@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+          integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+          crossorigin=""/>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+            integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+            crossorigin=""></script>
+    <script type="text/javascript">
+
+        function mapshow(longitude, latitude) {
+
+            var map;
+            //產生地圖   座標  大小
+            //map = L.map('map').setView([22.73444963475145, 120.28458595275877], 14);
+            map = L.map('map').setView([latitude, longitude], 14);
+
+            //設定圖資來源
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '<a href="https://www.openstreetmap.org/">OSM</a>',
+                maxZoom: 18,
+            }).addTo(map);
+
+            //特定座標上建立地標   draggable:true 座標可拖曳   autoPan 自動平移效果   autoPanPadding平移時與邊界的距離   autoPanSpeed一次移動的pixel數量
+            var marker = L.marker([latitude, longitude],
+                {
+                    draggable: true,
+                    autoPan: true,
+                    autoPanPadding: [200, 200],
+                    autoPanSpeed: 25
+                });
+            marker.addTo(map);
+
+            //加入圓圈
+            var circle = L.circle(
+                [latitude, longitude],   // 圓心座標
+                1000,                // 半徑（公尺）
+                {
+                    color: 'red',      // 線條顏色
+                    fillColor: '#f03', // 填充顏色
+                    fillOpacity: 0.3   // 透明度
+                }
+            ).addTo(map);
+
+            //加入框框
+            //var polygon = L.polygon([
+            //    [22.992, 120.289],
+            //    [22.982, 120.299],
+            //    [22.970, 120.267],
+            //    [22.990, 120.267]
+            //]).addTo(map);
+
+            //加上訊息方塊
+            marker.bindPopup("<strong>目前位置</strong>").openPopup();
+            circle.bindPopup("半徑1000公尺。");
+            //polygon.bindPopup("這是多邊形。");
+
+
+            //獨立的訊息方塊。
+            var popup = L.popup()
+                .setLatLng([latitude, longitude])
+                .setContent("目前位置。")
+                .openOn(map);
+
+            $.getJSON('YOURFILE.json', function (r) {
+                L.geoJSON(r, {color: '#333'}).addTo(map);
+            });
+        }
+    </script>
+
+</head>
+<body>
+<div style="width: 80% ;height: 100%;">
+    <div id="map"></div>
+</div>
+</body>
+</html>
+<script src="http://api.map.baidu.com/api?v=1.4" type="text/javascript"></script>
+<script type="text/javascript">
+
+    function getLocation() {
+        var options = {
+            enableHighAccuracy: true,
+            maximumAge: 1000
+        }
+        if (navigator.geolocation) {
+            //浏览器支持geolocation
+            navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+        } else {
+            //浏览器不支持geolocation
+            alert('不支援定位');
+        }
+    }
+
+    //成功时
+    function onSuccess(position) {
+        //返回用户位置
+        //经度
+        var longitude = position.coords.longitude;
+        //纬度
+        var latitude = position.coords.latitude;
+        //alert('当前地址的经纬度：经度' + longitude + '，纬度' + latitude);
+        //根据经纬度获取地理位置，不太准确，获取城市区域还是可以的
+        //var map = new BMap.Map("map");
+        //var point = new BMap.Point(longitude, latitude);
+        //var gc = new BMap.Geocoder();
+        //gc.getLocation(point, function (rs) {
+            //var addComp = rs.addressComponents;
+            //alert(addComp.province + ", " + addComp.city + ", " + addComp.district + ", " + addComp.street + ", " + addComp.streetNumber);
+        //});
+
+        mapshow(longitude, latitude);
+    }
+
+    //失敗時
+    function onError(error) {
+        switch (error.code) {
+            case 1:
+                alert("位置服務被拒絕");
+                break;
+            case 2:
+                alert("獲取不到位置信息");
+                break;
+            case 3:
+                alert("訊息過時");
+                break;
+            case 4:
+                alert("未知錯誤");
+                break;
+        }
+    }
+
+    // 页面载入时请求获取当前地理位置
+    window.onload = function () {
+        // html5获取地理位置
+        getLocation();
+    };
+</script>
