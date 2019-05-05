@@ -31,11 +31,21 @@
             font: 16px 'Lucida Grande', sans-serif;
         }
     </style>
+    <link rel="stylesheet" href="../static/css/style.css" type="text/css" media="all">
 <body>
 <div id="container">
-    <canvas class="center-block" id="canvasOutput" width=320 height=240></canvas>
+    <canvas class="center-block" id="canvasOutput" width=640 height=480></canvas>
 </div>
-<div class="text-center">
+<div>
+    <tr>
+        <td>
+            <input type="button" id="start" onclick="opencvIsReady();" value="開啟鏡頭">
+            <input type="button" id="addPersonButton" value="新增樣本">
+            <input type="button" id="close" onclick="stopCamera();" value="關閉">
+        </td>
+    </tr>
+</div>
+<div class="text-center" hidden="hidden">
     <input type="checkbox" id="face" name="classifier" value="face" checked hidden="hidden">
     <label for="face" hidden="hidden">face</label>
     <input type="checkbox" id="eye" name="cascade" value="eye" hidden="hidden">
@@ -43,7 +53,6 @@
 </div>
 <div class="invisible">
     <video id="video" class="hidden">Your browser does not support the video tag.</video>
-</div>
 </div>
 </body>
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
@@ -58,7 +67,7 @@
             Module.FS_createPreloadedFile('/', 'haarcascade_profileface.xml', 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_profileface.xml', true, false);
         }],
         _main: function () {
-            opencvIsReady();
+            //opencvIsReady();
         }
     };
 
@@ -224,7 +233,7 @@
     function stopCamera() {
         if (!streaming) return;
         stopVideoProcessing();
-        document.getElementById("canvasOutput").getContext("2d").clearRect(0, 0, width, height);
+        document.getElementById("canvasOutput").getContext("2d").clearRect(0, 0, videoWidth, videoHeight);
         video.pause();
         video.srcObject = null;
         stream.getVideoTracks()[0].stop();
@@ -244,11 +253,9 @@
     }
 
 
+
 </script>
 <script async src="https://huningxin.github.io/opencv.js/build/wasm/opencv.js"></script>
 
 </head>
-<body>
-
-</body>
 </html>
